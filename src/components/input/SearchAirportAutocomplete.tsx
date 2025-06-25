@@ -1,20 +1,11 @@
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import { useState, useEffect, useMemo } from "react";
+import {useState, useEffect, useMemo, type ReactNode} from "react";
 import debounce from "lodash.debounce";
-import axios from "axios";
-
-type Airport = {
-  skyId: string;
-  entityId: string;
-  presentation: {
-    suggestionTitle: string;
-    title: string;
-    subtitle: string;
-  };
-};
+import {searchAirports} from "../../services/flightService.ts";
+import type { Airport } from "../../types/searchAirport.ts";
 
 interface Props {
-  label: string;
+  label: ReactNode;
   onSelect: (airport: Airport | null) => void;
 }
 
@@ -24,14 +15,14 @@ const SearchAirportAutocomplete  = ({ label, onSelect }: Props) =>  {
   const [loading, setLoading] = useState(false);
 
   const fetchAirports = async (query: string) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await axios.get(`/api/airports?query=${query}`);
-      if (res.data?.status) {
-        setOptions(res.data.data);
+      const data = await searchAirports(query);
+      if (data?.status && Array.isArray(data.data)) {
+        setOptions(data.data);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -39,7 +30,7 @@ const SearchAirportAutocomplete  = ({ label, onSelect }: Props) =>  {
 
   const debouncedFetch = useMemo(() => debounce(fetchAirports, 400), []);
   useEffect(() => {
-    if (inputValue.length >= 2) debouncedFetch(inputValue);
+    if (inputValue.length >= 0) debouncedFetch(inputValue);
     else setOptions([]);
     return () => debouncedFetch.cancel();
   }, [debouncedFetch, inputValue]);

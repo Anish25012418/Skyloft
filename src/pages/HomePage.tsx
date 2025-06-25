@@ -15,7 +15,7 @@ const HomePage = () => {
         <h1 className="text-3xl md:text-5xl font-semibold">
           <span className="text-yellow-400"> SKYLOFT</span>
         </h1>
-        <p className="text-lg md:text-xl mt-2 tracking-wide mb-10">
+        <p className="text-lg md:text-xl mt-2 tracking-wide mb-3 md:mb-10">
           SELECT RIGHT FLIGHT FOR YOUR NEXT DESTINATION
         </p>
 
