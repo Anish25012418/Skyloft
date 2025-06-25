@@ -70,7 +70,12 @@ const FlightSearch = () => {
   };
 
   const handleSearch = () => {
-    dispatch(setFlightSearchParams(searchParams))
+    const formattedSearchParams = {
+      ...searchParams,
+      date: searchParams.date?.format("YYYY-MM-DD") || null,
+      returnDate: searchParams.returnDate?.format("YYYY-MM-DD") || null
+    }
+    dispatch(setFlightSearchParams(formattedSearchParams))
   }
 
   const updateTempPassenger = (key: keyof typeof tempPassengers, delta: number) => {
