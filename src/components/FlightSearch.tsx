@@ -27,10 +27,10 @@ import {doGetFlights} from "../store/flightSlice.ts";
 const FlightSearch = () => {
   const [searchParams, setSearchParams] = useState<FlightSearchParams>({
     trip: "one_way",
-    originSkyId: "12345",
-    destinationSkyId: "12345",
-    originEntityId: "12345",
-    destinationEntityId: "12345",
+    originSkyId: "LOND",
+    destinationSkyId: "NYCA",
+    originEntityId: "27544008",
+    destinationEntityId: "27537542",
     date: "",
     returnDate: "",
     cabinClass: "economy",
@@ -229,7 +229,7 @@ const FlightSearch = () => {
               label="Departure"
               disablePast={true}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, date: newValue?.format("YYYY-MM-DD") || ""}));
+                setSearchParams((prev) => ({...prev, date: newValue?.format("MM/DD/YYYY") || ""}));
               }}
             />
           </LocalizationProvider>
@@ -240,7 +240,7 @@ const FlightSearch = () => {
               disablePast={true}
               disabled={searchParams.trip === "one_way"}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, returnDate: newValue?.format("YYYY-MM-DD") || ""}));
+                setSearchParams((prev) => ({...prev, returnDate: newValue?.format("MM/DD/YYYY") || ""}));
               }}
             />
           </LocalizationProvider>

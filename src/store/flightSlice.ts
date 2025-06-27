@@ -23,7 +23,7 @@ const doGetFlights = createAsyncThunk(
   'fetchFlights',
   async (params: FlightSearchParams) => {
     try {
-      const response = await api.get('/flights/searchFlights', {
+      const response = await api.get('/v2/flights/searchFlights', {
         params: {
           ...params,
           sortBy: 'best',
@@ -61,7 +61,7 @@ const doGetFlights = createAsyncThunk(
 );
 
 
-const flightResultsSlice = createSlice({
+const flightSlice = createSlice({
   name: 'flightResults',
   initialState,
   reducers: {},
@@ -82,5 +82,5 @@ const flightResultsSlice = createSlice({
   }
 });
 
-export default flightResultsSlice.reducer;
+export default flightSlice.reducer;
 export {doGetFlights};
