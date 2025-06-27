@@ -1,4 +1,3 @@
-import { Dayjs } from "dayjs";
 
 export interface FlightSearchParams {
   trip: "one_way" | "round_trip" | "multi_city";
@@ -6,8 +5,8 @@ export interface FlightSearchParams {
   destinationSkyId: string;
   originEntityId: string;
   destinationEntityId: string;
-  date: Dayjs | null;
-  returnDate: Dayjs | null;
+  date: string;
+  returnDate: string;
   cabinClass: "economy" | "business" | "first" | "premium_economy";
   adults: number;
   children: number;

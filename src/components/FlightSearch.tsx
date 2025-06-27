@@ -22,16 +22,17 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {useAppDispatch} from "../hooks/store/hooks.ts";
 import {setFlightSearchParams} from "../store/flightSearchParamsSlice.ts";
+import {doGetFlights} from "../store/flightSlice.ts";
 
 const FlightSearch = () => {
   const [searchParams, setSearchParams] = useState<FlightSearchParams>({
     trip: "one_way",
-    originSkyId: "12345",
-    destinationSkyId: "12345",
-    originEntityId: "12345",
-    destinationEntityId: "12345",
-    date: null,
-    returnDate: null,
+    originSkyId: "LOND",
+    destinationSkyId: "NYCA",
+    originEntityId: "27544008",
+    destinationEntityId: "27537542",
+    date: "",
+    returnDate: "",
     cabinClass: "economy",
     adults: 1,
     children: 0,
@@ -52,7 +53,6 @@ const FlightSearch = () => {
   });
 
   const handleOpenPopover = (e: React.MouseEvent<HTMLElement>) => {
-    // Initialize temp state from actual
     setTempPassengers({
       adults: searchParams.adults,
       children: searchParams.children,
@@ -71,6 +71,7 @@ const FlightSearch = () => {
 
   const handleSearch = () => {
     dispatch(setFlightSearchParams(searchParams))
+    dispatch(doGetFlights(searchParams));
   }
 
   const updateTempPassenger = (key: keyof typeof tempPassengers, delta: number) => {
@@ -227,9 +228,8 @@ const FlightSearch = () => {
               name="date"
               label="Departure"
               disablePast={true}
-              value={searchParams.date}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, date: newValue}));
+                setSearchParams((prev) => ({...prev, date: newValue?.format("MM/DD/YYYY") || ""}));
               }}
             />
           </LocalizationProvider>
@@ -239,9 +239,8 @@ const FlightSearch = () => {
               label="Return"
               disablePast={true}
               disabled={searchParams.trip === "one_way"}
-              value={searchParams.returnDate}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, returnDate: newValue}));
+                setSearchParams((prev) => ({...prev, returnDate: newValue?.format("MM/DD/YYYY") || ""}));
               }}
             />
           </LocalizationProvider>
