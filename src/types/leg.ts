@@ -10,5 +10,5 @@ export interface Leg {
   arrival: string;
   durationInMinutes: number;
   stopCount: number;
-  carriers: Carrier[];
+  carriers: Carrier;
 }

@@ -4,36 +4,37 @@ import type {FlightSearchParams} from "../types/flightSearchParams.ts";
 import api from "../utility/apiClient.ts";
 import type {Itinerary} from "../types/itinerary.ts";
 import type {Leg} from "../types/leg.ts";
-import type {Carrier} from "../types/carrier.ts";
 import type {Marketing} from "../types/marketing.ts";
 
-interface FlightResultsState {
+interface FlightsState {
   isLoading: boolean,
   isError: boolean,
   flights: Itinerary[] | [];
 }
 
-const initialState: FlightResultsState = {
+const initialState: FlightsState = {
   isLoading: false,
   isError: false,
   flights: []
 };
 
+
+
 const doGetFlights = createAsyncThunk(
   'fetchFlights',
   async (params: FlightSearchParams) => {
+    const {trip, ...restParams} = params
     try {
       const response = await api.get('/v2/flights/searchFlights', {
         params: {
-          ...params,
+          ...restParams,
           sortBy: 'best',
           currency: 'USD',
           market: 'en-US',
           countryCode: 'US'
         }
       });
-
-      return response.data.data.context.itineraries.map((it: Itinerary) => ({
+      return response.data.data.itineraries.map((it: Itinerary) => ({
         id: it.id,
         price: it.price.formatted,
         legs: it.legs.map((leg: Leg) => ({
@@ -44,12 +45,11 @@ const doGetFlights = createAsyncThunk(
           arrival: leg.arrival,
           durationInMinutes: leg.durationInMinutes,
           stopCount: leg.stopCount,
-          carriers: leg.carriers.flatMap((carrier: Carrier) =>
-            carrier.marketing.map((m: Marketing) => ({
+          carriers: leg.carriers.marketing.map((m: Marketing) => ({
               id: m.id,
               name: m.name,
               logoUrl: m.logoUrl
-            }))
+            })
           )
         }))
       }));

@@ -20,26 +20,31 @@ import type {FlightSearchParams} from "../types/flightSearchParams.ts";
 import SearchAirportAutocomplete from "./input/SearchAirportAutocomplete.tsx";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {useAppDispatch} from "../hooks/store/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../hooks/store/hooks.ts";
 import {setFlightSearchParams} from "../store/flightSearchParamsSlice.ts";
 import {doGetFlights} from "../store/flightSlice.ts";
+import dayjs from "dayjs";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const FlightSearch = () => {
+  const flightSearchParams = useAppSelector(state => state.flightSearchParams);
   const [searchParams, setSearchParams] = useState<FlightSearchParams>({
-    trip: "one_way",
-    originSkyId: "LOND",
-    destinationSkyId: "NYCA",
-    originEntityId: "27544008",
-    destinationEntityId: "27537542",
-    date: "",
-    returnDate: "",
-    cabinClass: "economy",
-    adults: 1,
-    children: 0,
-    infants: 0
+    trip: flightSearchParams?.trip ?? "one_way",
+    originSkyId: flightSearchParams?.originSkyId ?? "LOND",
+    destinationSkyId: flightSearchParams?.destinationSkyId ?? "NYCA",
+    originEntityId: flightSearchParams?.originEntityId ?? "27544008",
+    destinationEntityId: flightSearchParams?.destinationEntityId ?? "27537542",
+    date: flightSearchParams?.date ?? "",
+    returnDate: flightSearchParams?.returnDate ?? "",
+    cabinClass: flightSearchParams?.cabinClass ?? "economy",
+    adults: flightSearchParams?.adults ?? 1,
+    children: flightSearchParams?.children ?? 0,
+    infants: flightSearchParams?.infants ??0
   });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
+  const location = useLocation();
 
   const handleChange = (event: SelectChangeEvent) => {
     const {name, value} = event.target;
@@ -72,6 +77,10 @@ const FlightSearch = () => {
   const handleSearch = () => {
     dispatch(setFlightSearchParams(searchParams))
     dispatch(doGetFlights(searchParams));
+    console.log(location.pathname)
+    if (location.pathname !== "/flights") {
+      navigate("/flights");
+    }
   }
 
   const updateTempPassenger = (key: keyof typeof tempPassengers, delta: number) => {
@@ -228,8 +237,9 @@ const FlightSearch = () => {
               name="date"
               label="Departure"
               disablePast={true}
+              value={searchParams.date ? dayjs(searchParams.date) : null}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, date: newValue?.format("MM/DD/YYYY") || ""}));
+                setSearchParams((prev) => ({...prev, date: newValue?.format("YYYY-MM-DD") || ""}));
               }}
             />
           </LocalizationProvider>
@@ -239,8 +249,9 @@ const FlightSearch = () => {
               label="Return"
               disablePast={true}
               disabled={searchParams.trip === "one_way"}
+              value={searchParams.returnDate ? dayjs(searchParams.returnDate) : null}
               onChange={(newValue) => {
-                setSearchParams((prev) => ({...prev, returnDate: newValue?.format("MM/DD/YYYY") || ""}));
+                setSearchParams((prev) => ({...prev, returnDate: newValue?.format("YYYY-MM-DD") || ""}));
               }}
             />
           </LocalizationProvider>
