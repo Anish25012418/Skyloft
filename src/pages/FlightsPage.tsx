@@ -2,11 +2,10 @@ import FlightSearch from "../components/FlightSearch.tsx";
 import {useAppSelector} from "../hooks/store/hooks.ts";
 import {Loader} from "lucide-react";
 import type {Leg} from "../types/leg.ts";
-import type {Carrier} from "../types/carrier.ts";
+import type {Marketing} from "../types/marketing.ts";
 
 const FlightsPage = () => {
-  const isLoading = useAppSelector(state => state.flights.isLoading);
-  const flights = useAppSelector(state => state.flights.flights);
+  const {isLoading, flights} = useAppSelector(state => state.flights);
 
   if (isLoading) {
     return (
@@ -17,77 +16,72 @@ const FlightsPage = () => {
   }
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-black">
-      <div className="flex flex-col mt-5 h-full text-white px-4">
+    <div className="h-full w-full overflow-hidden pb-5 bg-black">
+      <div className="flex flex-col mt-5 h-full text-black px-4">
         <FlightSearch/>
-      </div>
-      <div className="overflow-x-auto rounded-lg shadow">
-        <table className="min-w-full table-fixed border border-gray-200">
-          <thead className="bg-gray-100 border-b border-gray-300">
-          <tr>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Airline</th>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Duration</th>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Departure</th>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Arrival</th>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Stops</th>
-            <th className="p-3 text-sm font-semibold tracking-wide text-left">Price</th>
-          </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-          {flights.map((flight, index) => (
-            <tr key={index} className="bg-white even:bg-gray-50 hover:bg-gray-100 transition">
 
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                <div className="flex flex-wrap items-center gap-2">
-                  {flight.legs
-                    .flatMap((leg) => leg.carriers)
-                    .filter((carrier, idx: number, arr: Carrier[]) =>
-                      arr.findIndex(c => c.id === carrier.id) === idx // remove duplicate carriers
-                    )
-                    .map((carrier: Carrier) => (
-                      <div key={carrier.id} className="flex items-center gap-1">
-                        <img src={carrier.logoUrl} alt={carrier.name} className="w-5 h-5 object-contain" />
-                        <span>{carrier.name}</span>
-                      </div>
-                    ))
-                  }
-                </div>
-              </td>
-
-              {/* Total Duration */}
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                {Math.floor(
-                  flight.legs.reduce((acc: number, leg: any) => acc + leg.durationInMinutes, 0) / 60
-                )}h{" "}
-                {flight.legs.reduce((acc: number, leg: any) => acc + leg.durationInMinutes, 0) % 60}m
-              </td>
-
-              {/* Departure */}
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                {flight.legs[0]?.origin || "N/A"} <br />
-                <span className="text-xs text-gray-500">{flight.legs[0]?.departure || "N/A"}</span>
-              </td>
-
-              {/* Arrival */}
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                {flight.legs.at(-1)?.destination || "N/A"} <br />
-                <span className="text-xs text-gray-500">{flight.legs.at(-1)?.arrival || "N/A"}</span>
-              </td>
-
-              {/* Stops */}
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-                {flight.legs.reduce((acc: number, leg: any) => acc + leg.stopCount, 0)} stop(s)
-              </td>
-
-              {/* Price */}
-              <td className="p-3 text-sm text-gray-700 whitespace-nowrap font-semibold">
-                {flight.price || "N/A"}
-              </td>
-
+        <div className="overflow-x-auto rounded-lg shadow bg-white">
+          <table className="min-w-full table-fixed border border-gray-200">
+            <thead className="bg-gray-100 border-b border-gray-300">
+            <tr>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Airline</th>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Duration</th>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Departure</th>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Arrival</th>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Stops</th>
+              <th className="p-3 text-sm font-semibold tracking-wide text-left">Price</th>
             </tr>
-          ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+            {flights.map((flight, index) => (
+              <tr key={index} className="bg-white even:bg-gray-50 hover:bg-gray-100 transition">
+
+                <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {
+                      flight.legs.map((leg: Leg) => (
+                        leg.carriers.marketing.map((marketing: Marketing, index: number) => (
+                          <div key={marketing.id} className="flex items-center gap-1">
+                            <img src={marketing.logoUrl} alt={marketing.name} className="w-12 h-12 object-contain"/>
+                            <span>{marketing.name}</span>
+                            {index < leg.carriers.marketing.length -1 && <span className="px-1 text-gray-400">|</span>}
+                          </div>
+                        ))
+                      ))
+                    }
+                  </div>
+                </td>
+
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {Math.floor(
+                        flight.legs.reduce((acc: number, leg: Leg) => acc + leg.durationInMinutes, 0) / 60
+                      )}h{" "}
+                      {flight.legs.reduce((acc: number, leg: Leg) => acc + leg.durationInMinutes, 0) % 60}m
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {flight.legs[0]?.origin.name || "N/A"} <br />
+                      <span className="text-xs text-gray-500">{flight.legs[0]?.departure || "N/A"}</span>
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {flight.legs[flight.legs.length -1]?.destination.name || "N/A"} <br />
+                      <span className="text-xs text-gray-500">{flight.legs[flight.legs.length -1]?.arrival || "N/A"}</span>
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      {flight.legs.reduce((acc: number, leg: Leg) => acc + leg.stopCount, 0)} stop(s)
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap font-semibold">
+                      {flight.price?.formatted || "N/A"}
+                    </td>
+
+              </tr>
+            ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
