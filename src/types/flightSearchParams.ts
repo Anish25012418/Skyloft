@@ -1,6 +1,9 @@
+import type {Airport} from "./searchAirport.ts";
 
 export interface FlightSearchParams {
-  trip: "one_way" | "round_trip" | "multi_city";
+  trip: "one_way" | "round_trip";
+  origin: Airport | null;
+  destination: Airport | null;
   originSkyId: string;
   destinationSkyId: string;
   originEntityId: string;

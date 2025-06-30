@@ -30,6 +30,8 @@ const FlightSearch = () => {
   const flightSearchParams = useAppSelector(state => state.flightSearchParams);
   const [searchParams, setSearchParams] = useState<FlightSearchParams>({
     trip: flightSearchParams?.trip ?? "one_way",
+    origin: flightSearchParams?.origin ?? null,
+    destination: flightSearchParams?.destination ??null,
     originSkyId: flightSearchParams?.originSkyId ?? "LOND",
     destinationSkyId: flightSearchParams?.destinationSkyId ?? "NYCA",
     originEntityId: flightSearchParams?.originEntityId ?? "27544008",
@@ -39,7 +41,7 @@ const FlightSearch = () => {
     cabinClass: flightSearchParams?.cabinClass ?? "economy",
     adults: flightSearchParams?.adults ?? 1,
     children: flightSearchParams?.children ?? 0,
-    infants: flightSearchParams?.infants ??0
+    infants: flightSearchParams?.infants ?? 0
   });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const dispatch = useAppDispatch();
@@ -114,7 +116,6 @@ const FlightSearch = () => {
             >
               <MenuItem value={"one_way"}>One Way</MenuItem>
               <MenuItem value={"round_trip"}>Round Trip</MenuItem>
-              <MenuItem value={"multi_city"}>Multi City</MenuItem>
             </Select>
           </FormControl>
 
@@ -214,20 +215,23 @@ const FlightSearch = () => {
         <div className="grid grid-cols-2 md:grid-cols-4  gap-4 mb-4">
           <SearchAirportAutocomplete
             label={<span className="flex items-center gap-1"><FlightTakeoffIcon fontSize="small" className="mr-1"/> From</span>}
+            value={searchParams.origin}
             onSelect={(airport) => {
               setSearchParams((prevState) => ({
                 ...prevState,
+                origin: airport,
                 originSkyId: airport?.skyId || "",
                 originEntityId: airport?.entityId || ""
               }))
             }}
           />
           <SearchAirportAutocomplete
-            label={<span className="flex items-center gap-1"><FlightLandIcon fontSize="small"
-                                                                             className="mr-1"/> To</span>}
+            label={<span className="flex items-center gap-1"><FlightLandIcon fontSize="small" className="mr-1"/> To</span>}
+            value={searchParams.destination}
             onSelect={(airport) => {
               setSearchParams((prevState) => ({
                 ...prevState,
+                destination: airport,
                 destinationSkyId: airport?.skyId || "",
                 destinationEntityId: airport?.entityId || ""
               }))
