@@ -6,10 +6,11 @@ import type { Airport } from "../../types/searchAirport.ts";
 
 interface Props {
   label: ReactNode;
+  value: Airport | null;
   onSelect: (airport: Airport | null) => void;
 }
 
-const SearchAirportAutocomplete  = ({ label, onSelect }: Props) =>  {
+const SearchAirportAutocomplete  = ({ label, value, onSelect }: Props) =>  {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<Airport[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +42,7 @@ const SearchAirportAutocomplete  = ({ label, onSelect }: Props) =>  {
       getOptionLabel={(option) =>
         option.presentation?.suggestionTitle || option.presentation?.title || ""
       }
+      value={value}
       onInputChange={(_, value) => setInputValue(value)}
       onChange={(_, value) => onSelect(value)}
       loading={loading}

@@ -4,53 +4,72 @@ import type {FlightSearchParams} from "../types/flightSearchParams.ts";
 import api from "../utility/apiClient.ts";
 import type {Itinerary} from "../types/itinerary.ts";
 import type {Leg} from "../types/leg.ts";
-import type {Carrier} from "../types/carrier.ts";
 import type {Marketing} from "../types/marketing.ts";
 
-interface FlightResultsState {
+interface FlightsState {
   isLoading: boolean,
   isError: boolean,
   flights: Itinerary[] | [];
 }
 
-const initialState: FlightResultsState = {
+const initialState: FlightsState = {
   isLoading: false,
   isError: false,
   flights: []
 };
 
+
 const doGetFlights = createAsyncThunk(
   'fetchFlights',
   async (params: FlightSearchParams) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {trip, ...restParams} = params
     try {
       const response = await api.get('/v2/flights/searchFlights', {
         params: {
-          ...params,
+          ...restParams,
           sortBy: 'best',
           currency: 'USD',
           market: 'en-US',
           countryCode: 'US'
         }
       });
-
-      return response.data.data.context.itineraries.map((it: Itinerary) => ({
+      return response.data.data.itineraries.map((it: Itinerary) => ({
         id: it.id,
-        price: it.price.formatted,
+        price: {
+          formatted: it.price.formatted,
+        },
         legs: it.legs.map((leg: Leg) => ({
           id: leg.id,
-          origin: leg.origin.name,
-          destination: leg.destination.name,
+          origin: {
+            id: leg.origin.id,
+            entityId: leg.origin.entityId,
+            name: leg.origin.name,
+            displayCode: leg.origin.displayCode,
+            city: leg.origin.city,
+            country: leg.origin.country,
+            isHighlighted: leg.origin.isHighlighted
+          },
+          destination: {
+            id: leg.destination.id,
+            entityId: leg.destination.entityId,
+            name: leg.destination.name,
+            displayCode: leg.destination.displayCode,
+            city: leg.destination.city,
+            country: leg.destination.country,
+            isHighlighted: leg.destination.isHighlighted
+          },
           departure: leg.departure,
           arrival: leg.arrival,
           durationInMinutes: leg.durationInMinutes,
           stopCount: leg.stopCount,
-          carriers: leg.carriers.flatMap((carrier: Carrier) =>
-            carrier.marketing.map((m: Marketing) => ({
+          carriers: {
+            marketing: leg.carriers.marketing.map((m: Marketing) => ({
               id: m.id,
               name: m.name,
               logoUrl: m.logoUrl
             }))
-          )
+          }
         }))
       }));
     } catch (error) {
